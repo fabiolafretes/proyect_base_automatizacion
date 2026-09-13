@@ -80,7 +80,7 @@ jobs:
             --loops "${{ inputs.loops || '3' }}" \
             --author "${{ github.triggering_actor }}" \
             --api-version "${{ github.sha }}" \
-            --repo-url "${{ github.server_url }}/${{ github.repository }}"
+            --repo-url "https://github.com/stevenayal/proyect_base_automatizacion"
 
       - name: Evaluar umbrales
         run: |
