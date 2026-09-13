@@ -303,6 +303,27 @@
             "packages": {},
             "requests": {}
           }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const timestamp = Date.now();\r",
+              "\r",
+              "pm.environment.set(\r",
+              "    \"happyEmail\",\r",
+              "    `usuario.happy.${timestamp}@example.com`\r",
+              ");\r",
+              "\r",
+              "pm.environment.set(\r",
+              "    \"happyDocumento\",\r",
+              "    `${timestamp}`\r",
+              ");"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
         }
       ],
       "request": {
@@ -319,7 +340,7 @@
         ],
         "body": {
           "mode": "raw",
-          "raw": "{\n  \"nombre\": \"Usuario QA\",\n  \"email\": \"usuario.qa.290826@example.com\",\n  \"documentoTipo\": \"CI\",\n  \"documentoNumero\": \"7834291\",\n  \"fechaNacimiento\": \"1995-06-12\",\n  \"direccion\": \"Asunción, Paraguay\"\n}",
+          "raw": "{\n  \"nombre\": \"Usuario QA\",\n  \"email\": \"{{happyEmail}}\",\n  \"documentoTipo\": \"CI\",\n  \"documentoNumero\": \"{{happyDocumento}}\",\n  \"fechaNacimiento\": \"1995-06-12\",\n  \"direccion\": \"Asunción, Paraguay\"\n}",
           "options": {
             "raw": {
               "language": "json"
