@@ -57,10 +57,9 @@ jobs:
         run: |
           mkdir -p "${RESULTS_DIR}/dashboard"
           "apache-jmeter-${JMETER_VERSION}/bin/jmeter" -n \
-            -t tests/performance/plans/Grupo04_Onboarding.jmx \
+            -t tests/performance/plans/Grupo04_Onboarding_BD.jmx \
             -l "${RESULTS_DIR}/grupo04-resultados.jtl" \
             -e -o "${RESULTS_DIR}/dashboard" \
-            -JcsvPath=tests/performance/data/grupo04-usuarios.csv \
             -JapiKey="${API_KEY}" \
             -Jthreads="${{ inputs.threads || '1' }}" \
             -Jloops="${{ inputs.loops || '3' }}" \
@@ -74,7 +73,7 @@ jobs:
             tests/performance/thresholds/grupo04-thresholds.json \
             "${RESULTS_DIR}/INFORME_JMETER_GRUPO04.pdf" \
             --api-name "AIQUAA Sandbox - Onboarding" \
-            --plan tests/performance/plans/Grupo04_Onboarding.jmx \
+            --plan tests/performance/plans/Grupo04_Onboarding_BD.jmx \
             --test-type carga \
             --threads "${{ inputs.threads || '1' }}" \
             --loops "${{ inputs.loops || '3' }}" \
