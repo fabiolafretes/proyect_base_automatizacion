@@ -321,6 +321,27 @@
             "packages": {},
             "requests": {}
           }
+        },
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "const timestamp = Date.now();\r",
+              "\r",
+              "pm.environment.set(\r",
+              "    \"happyEmail\",\r",
+              "    `usuario.happy.${timestamp}@example.com`\r",
+              ");\r",
+              "\r",
+              "pm.environment.set(\r",
+              "    \"happyDocumento\",\r",
+              "    `${timestamp}`\r",
+              ");"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
         }
       ],
       "request": {

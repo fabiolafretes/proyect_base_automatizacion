@@ -15,6 +15,7 @@ on:
     branches: ["grupo-04-registro-onboarding"]
     paths:
       - "tests/performance/**"
+      - "monitoring/**"
       - ".github/workflows/jmeter-grupo04-performance.yml"
 
 permissions:
@@ -44,6 +45,15 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar Selenium
+        run: |
+          python -m pip install selenium
+
       - name: Instalar JMeter
         run: |
           curl --fail --location --silent --show-error \
@@ -65,9 +75,40 @@ jobs:
             -Jloops="${{ inputs.loops || '3' }}" \
             -JdelayMs=2500
 
+      - name: Capturar evidencia de Grafana
+        if: always()
+        continue-on-error: true
+        run: |
+          mkdir -p "${RESULTS_DIR}/evidence"
+
+          python grupos/grupo-04-registro-onboarding/monitoring/capture_grafana.py
+
+          if [ -f "grupos/grupo-04-registro-onboarding/resultados/evidencia/EVIDENCIA_MONITOREO.png" ]; then
+            cp "grupos/grupo-04-registro-onboarding/resultados/evidencia/EVIDENCIA_MONITOREO.png" \
+              "${RESULTS_DIR}/evidence/EVIDENCIA_MONITOREO.png"
+
+            echo "Evidencia Grafana copiada correctamente."
+          else
+            echo "No se encontró la evidencia de Grafana."
+          fi
+
       - name: Generar informe PDF
         if: always()
         run: |
+          EVIDENCE_ARGS=()
+
+          if [ -f "${RESULTS_DIR}/evidence/EVIDENCIA_MONITOREO.png" ]; then
+            EVIDENCE_ARGS=(
+              --evidence-image "${RESULTS_DIR}/evidence/EVIDENCIA_MONITOREO.png"
+              --evidence-label "Dashboard de monitoreo"
+              --evidence-url "https://purplespinach239.grafana.net/public-dashboards/ce95c3fa413048d3a79d3c6fc60de958"
+            )
+
+            echo "Se incluirá evidencia de Grafana en el informe."
+          else
+            echo "No se encontró evidencia de Grafana. Se continúa sin ella."
+          fi
+
           npx -y aiquaa-performance-mcp-server --report \
             "${RESULTS_DIR}/grupo04-resultados.jtl" \
             tests/performance/thresholds/grupo04-thresholds.json \
@@ -79,7 +120,8 @@ jobs:
             --loops "${{ inputs.loops || '3' }}" \
             --author "${{ github.triggering_actor }}" \
             --api-version "${{ github.sha }}" \
-            --repo-url "https://github.com/stevenayal/proyect_base_automatizacion"
+            --repo-url "${{ github.server_url }}/${{ github.repository }}" \
+            "${EVIDENCE_ARGS[@]}"
 
       - name: Evaluar umbrales
         run: |

@@ -63,18 +63,31 @@ solicitudes sin depender de datos fijos.
 
 Las evidencias se encuentran en `evidence/semana-03/`.
 
+Se utilizó la Skill BDD mediante OpenCode para generar escenarios API + BD del Grupo 04.
+
+Resultado de ejecución:
+
+- 5 escenarios aprobados
+- 32 steps aprobados
+
+### Evidencias
+
+Las evidencias de la tarea se encuentran en:
+
+`evidence/semana-03/`
+
 ## Semana 4 - Automatización y rendimiento
 
 Se agregaron dos pipelines independientes:
 
-- `postman-grupo04-onboarding.yml`: ejecuta las dos carpetas dinámicas con
-  Newman, exporta `results.json`, genera el informe PDF con Python y publica
-  ambos archivos como artefacto.
+- `postman-grupo04-onboarding.yml`: ejecuta con Newman las dos carpetas de
+  validación dinámica de la Semana 3, exporta el resultado JSON, genera un
+  informe PDF con Python y publica ambos archivos como artefacto.
 - `jmeter-grupo04-performance.yml`: ejecuta el flujo de creación y consulta con
-  JMeter, genera el dashboard HTML y el informe PDF, evalúa los umbrales y
+  JMeter, genera el dashboard HTML y un informe PDF, evalúa los umbrales y
   publica la evidencia.
 
 El plan `Grupo04_Onboarding.jmx` consume datos desde CSV, genera datos únicos,
-extrae el ID del usuario creado mediante JSONPath y lo utiliza en la consulta
-GET. La API key se guarda exclusivamente en el secreto `GRUPO04_API_KEY` de
-GitHub Actions.
+extrae el ID del usuario creado mediante JSONPath y lo correlaciona con la
+consulta GET. La API key se configura únicamente como secreto de GitHub con el
+nombre `GRUPO04_API_KEY`.
