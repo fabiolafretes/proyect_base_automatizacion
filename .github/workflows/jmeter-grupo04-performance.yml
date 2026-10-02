@@ -1,4 +1,4 @@
-name: JMeter Grupo 04 - Onboarding
+nname: JMeter Grupo 04 - Onboarding
 
 on:
   workflow_dispatch:
@@ -15,6 +15,7 @@ on:
     branches: ["grupo-04-registro-onboarding"]
     paths:
       - "tests/performance/**"
+      - "monitoring/**"
       - ".github/workflows/jmeter-grupo04-performance.yml"
 
 permissions:
@@ -44,6 +45,15 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar Selenium
+        run: |
+          python -m pip install selenium
+
       - name: Instalar JMeter
         run: |
           curl --fail --location --silent --show-error \
@@ -66,9 +76,19 @@ jobs:
             -Jloops="${{ inputs.loops || '3' }}" \
             -JdelayMs=2500
 
+      - name: Capturar evidencia de Grafana
+        if: always()
+        continue-on-error: true
+        run: |
+          mkdir -p resultados/evidencia
+          python monitoring/capture_grafana.py
+
       - name: Generar informe PDF
         if: always()
         run: |
+          cp resultados/evidencia/EVIDENCIA_MONITOREO.png \
+            "${RESULTS_DIR}/EVIDENCIA_MONITOREO.png"
+
           npx -y aiquaa-performance-mcp-server --report \
             "${RESULTS_DIR}/grupo04-resultados.jtl" \
             tests/performance/thresholds/grupo04-thresholds.json \
@@ -80,7 +100,10 @@ jobs:
             --loops "${{ inputs.loops || '3' }}" \
             --author "${{ github.triggering_actor }}" \
             --api-version "${{ github.sha }}" \
-            --repo-url "${{ github.server_url }}/${{ github.repository }}"
+            --repo-url "${{ github.server_url }}/${{ github.repository }}" \
+            --evidence-image "${RESULTS_DIR}/EVIDENCIA_MONITOREO.png" \
+            --evidence-label "Dashboard de monitoreo" \
+            --evidence-url "https://purplespinach239.grafana.net/public-dashboards/ce95c3fa413048d3a79d3c6fc60de958"
 
       - name: Evaluar umbrales
         run: |
