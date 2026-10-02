@@ -1,4 +1,4 @@
-nname: JMeter Grupo 04 - Onboarding
+name: JMeter Grupo 04 - Onboarding
 
 on:
   workflow_dispatch:
@@ -11,6 +11,7 @@ on:
         description: "Iteraciones por usuario"
         required: false
         default: "3"
+
   push:
     branches: ["grupo-04-registro-onboarding"]
     paths:
@@ -66,6 +67,7 @@ jobs:
           API_KEY: ${{ secrets.GRUPO04_API_KEY }}
         run: |
           mkdir -p "${RESULTS_DIR}/dashboard"
+
           "apache-jmeter-${JMETER_VERSION}/bin/jmeter" -n \
             -t tests/performance/plans/Grupo04_Onboarding.jmx \
             -l "${RESULTS_DIR}/grupo04-resultados.jtl" \
@@ -80,14 +82,36 @@ jobs:
         if: always()
         continue-on-error: true
         run: |
+          mkdir -p "${RESULTS_DIR}/evidence"
           mkdir -p resultados/evidencia
+
           python monitoring/capture_grafana.py
+
+          if [ -f resultados/evidencia/EVIDENCIA_MONITOREO.png ]; then
+            cp resultados/evidencia/EVIDENCIA_MONITOREO.png \
+              "${RESULTS_DIR}/evidence/EVIDENCIA_MONITOREO.png"
+
+            echo "Evidencia Grafana copiada correctamente."
+          else
+            echo "No se encontró la evidencia de Grafana."
+          fi
 
       - name: Generar informe PDF
         if: always()
         run: |
-          cp resultados/evidencia/EVIDENCIA_MONITOREO.png \
-            "${RESULTS_DIR}/EVIDENCIA_MONITOREO.png"
+          EVIDENCE_ARGS=()
+
+          if [ -f "${RESULTS_DIR}/evidence/EVIDENCIA_MONITOREO.png" ]; then
+            EVIDENCE_ARGS=(
+              --evidence-image "${RESULTS_DIR}/evidence/EVIDENCIA_MONITOREO.png"
+              --evidence-label "Dashboard de monitoreo"
+              --evidence-url "https://purplespinach239.grafana.net/public-dashboards/ce95c3fa413048d3a79d3c6fc60de958"
+            )
+
+            echo "Se incluirá evidencia de Grafana en el informe."
+          else
+            echo "No se encontró evidencia de Grafana. Se continúa sin ella."
+          fi
 
           npx -y aiquaa-performance-mcp-server --report \
             "${RESULTS_DIR}/grupo04-resultados.jtl" \
@@ -101,9 +125,7 @@ jobs:
             --author "${{ github.triggering_actor }}" \
             --api-version "${{ github.sha }}" \
             --repo-url "${{ github.server_url }}/${{ github.repository }}" \
-            --evidence-image "${RESULTS_DIR}/EVIDENCIA_MONITOREO.png" \
-            --evidence-label "Dashboard de monitoreo" \
-            --evidence-url "https://purplespinach239.grafana.net/public-dashboards/ce95c3fa413048d3a79d3c6fc60de958"
+            "${EVIDENCE_ARGS[@]}"
 
       - name: Evaluar umbrales
         run: |
