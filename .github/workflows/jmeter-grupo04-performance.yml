@@ -139,5 +139,3 @@ jobs:
           name: jmeter-grupo04-onboarding
           path: test-results/performance/grupo04/
           retention-days: 7
-
-          .
