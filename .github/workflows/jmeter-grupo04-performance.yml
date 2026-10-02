@@ -83,12 +83,11 @@ jobs:
         continue-on-error: true
         run: |
           mkdir -p "${RESULTS_DIR}/evidence"
-          mkdir -p resultados/evidencia
 
-          python monitoring/capture_grafana.py
+          python grupos/grupo-04-registro-onboarding/monitoring/capture_grafana.py
 
-          if [ -f resultados/evidencia/EVIDENCIA_MONITOREO.png ]; then
-            cp resultados/evidencia/EVIDENCIA_MONITOREO.png \
+          if [ -f "grupos/grupo-04-registro-onboarding/resultados/evidencia/EVIDENCIA_MONITOREO.png" ]; then
+            cp "grupos/grupo-04-registro-onboarding/resultados/evidencia/EVIDENCIA_MONITOREO.png" \
               "${RESULTS_DIR}/evidence/EVIDENCIA_MONITOREO.png"
 
             echo "Evidencia Grafana copiada correctamente."
