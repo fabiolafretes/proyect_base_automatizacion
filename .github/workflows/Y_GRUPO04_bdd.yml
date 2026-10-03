@@ -1,10 +1,16 @@
 name: Grupo 04 - Cucumber y Playwright
 on:
   workflow_dispatch:
+  push:
+    branches: ['grupo-04-registro-onboarding']
+    paths:
+      - 'tests/bdd/grupo04/**'
+      - '.github/workflows/Y_GRUPO04_bdd.yml'
 permissions:
   contents: read
 jobs:
   bdd:
+    if: github.repository == 'stevenayal/proyect_base_automatizacion'
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
